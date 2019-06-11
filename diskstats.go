@@ -6,7 +6,7 @@ import (
     "github.com/shirou/gopsutil/disk"
 )
 
-func main() {
+func DiskStats() {
     usase, _ := disk.Usage("/")
 
     //almost every return value is a struct
