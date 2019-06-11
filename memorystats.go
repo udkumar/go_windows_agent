@@ -6,7 +6,7 @@ import (
     "github.com/shirou/gopsutil/mem"
 )
 
-func main() {
+func MemoryStats() {
     v, _ := mem.VirtualMemory()
 
     // almost every return value is a struct
