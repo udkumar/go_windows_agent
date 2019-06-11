@@ -6,7 +6,7 @@ import (
     "github.com/shirou/gopsutil/cpu"
 )
 
-func main() {
+func CpuStats() {
     info, _ := cpu.Info()
 
     //almost every return value is a struct
