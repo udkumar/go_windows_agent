@@ -6,7 +6,7 @@ import (
     "github.com/shirou/gopsutil/host"
 )
 
-func main() {
+func HostStats() {
     infoStat, _ := host.Info()
 
     //almost every return value is a struct
