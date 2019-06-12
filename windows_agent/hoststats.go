@@ -1,4 +1,4 @@
-package host
+package windowsagent
 
 import (
     "fmt"
