@@ -1,4 +1,4 @@
-package winservices
+package windowsagent
 
 import (
     "fmt"
