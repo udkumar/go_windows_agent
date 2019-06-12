@@ -1,16 +1,15 @@
 package windowsagent
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/host"
 )
 
-func HostStats() {
-    infoStat, _ := host.Info()
+func HostStats() (*host.InfoStat, error) {
+	infoStat, err := host.Info()
 
-    //almost every return value is a struct
-    fmt.Printf("All Host info: ", infoStat)
-    return infoStat, err
-    
+	//almost every return value is a struct
+	fmt.Printf("All Host info: ", infoStat)
+	return infoStat, err
 }

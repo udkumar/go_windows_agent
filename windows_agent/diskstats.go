@@ -1,15 +1,15 @@
 package windowsagent
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/disk"
 )
 
-func DiskStats() {
-    usase, _ := disk.Usage("/")
+func DiskStats() (*disk.UsageStat, error) {
+	usase, err := disk.Usage("/")
 
-    //almost every return value is a struct
-    fmt.Printf("All Usase: ", usase)
-    return usase, err
+	//almost every return value is a struct
+	fmt.Printf("All Usase: ", usase)
+	return usase, err
 }

@@ -1,16 +1,15 @@
 package windowsagent
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/cpu"
 )
 
-func CpuStats() {
-    info, _ := cpu.Info()
+func CpuStats() ([]cpu.InfoStat, error) {
+	info, err := cpu.Info()
 
-    //almost every return value is a struct
-    fmt.Printf("All info: ", info)
-    return info, err
-    
+	//almost every return value is a struct
+	fmt.Printf("All info: ", info)
+	return info, err
 }

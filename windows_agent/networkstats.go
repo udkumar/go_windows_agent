@@ -6,8 +6,8 @@ import (
     "github.com/shirou/gopsutil/net"
 )
 
-func NetStats() {
-    infoIOCounter, _ := net.IOCounters(true)
+func NetStats() ([]net.IOCountersStat, error) {
+    infoIOCounter, err := net.IOCounters(true)
 
     //almost every return value is a struct
     fmt.Printf("All net info: ", infoIOCounter)
