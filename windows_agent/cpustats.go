@@ -1,4 +1,4 @@
-package cpu
+package windowsagent
 
 import (
     "fmt"
