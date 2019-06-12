@@ -13,6 +13,6 @@ func MemoryStats() {
     fmt.Printf("Total: %v, Free:%v, UsedPercent:%f%%\n", v.Total, v.Free, v.UsedPercent)
 
     fmt.Println(v.String())
-    return v
+    return v, err
     
 }
