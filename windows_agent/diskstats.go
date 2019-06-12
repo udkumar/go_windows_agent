@@ -11,5 +11,5 @@ func DiskStats() {
 
     //almost every return value is a struct
     fmt.Printf("All Usase: ", usase)
-    
+    return usase, err
 }
