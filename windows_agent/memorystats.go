@@ -1,18 +1,17 @@
 package windowsagent
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/mem"
 )
 
-func MemoryStats() {
-    v, _ := mem.VirtualMemory()
+func MemoryStats() (*mem.VirtualMemoryStat, error) {
+	v, err := mem.VirtualMemory()
 
-    // almost every return value is a struct
-    fmt.Printf("Total: %v, Free:%v, UsedPercent:%f%%\n", v.Total, v.Free, v.UsedPercent)
+	// almost every return value is a struct
+	fmt.Printf("Total: %v, Free:%v, UsedPercent:%f%%\n", v.Total, v.Free, v.UsedPercent)
 
-    fmt.Println(v.String())
-    return v, err
-    
+	fmt.Println(v.String())
+	return v, err
 }

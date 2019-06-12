@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/go_windows_agent/windows_agent"
+	windowsagent "github.com/udkumar/go_windows_agent/windows_agent"
 )
 
 func main() {
@@ -11,6 +11,4 @@ func main() {
 
 	cpuInfo, _ := windowsagent.CpuStats()
 	fmt.Println("cpu info", cpuInfo)
-	
-	
-} 
+}
