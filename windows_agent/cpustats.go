@@ -11,6 +11,6 @@ func CpuStats() {
 
     //almost every return value is a struct
     fmt.Printf("All info: ", info)
-    return info
+    return info, err
     
 }
