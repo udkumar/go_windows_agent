@@ -7,7 +7,10 @@ import (
 )
 
 func main() {
-	
+	// winServices, _ := windowsagent.WindowsServices()
+
+	cpuInfo, _ := windowsagent.CpuStats()
+	fmt.Println("cpu info", cpuInfo)
 	
 	
 } 
