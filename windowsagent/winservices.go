@@ -1,7 +1,7 @@
 package windowsagent
 
 // func WindowsServices() {
-// 	listServices, _ := winservices.NewService("")
+// 	listServices, _ := vs.NewService("")
 // 	fmt.Printf("All listServices: ", listServices)
 
 // 	processList, _ := ps.Processes()

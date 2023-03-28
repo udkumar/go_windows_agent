@@ -133,6 +133,12 @@ func Stats(addr, portRange string) string {
 		logrus.Errorf("cannot marshal json: %+v", err)
 	}
 
+	// ns := &NmapStats{}
+	// if err = json.Unmarshal(bx, ns); err != nil {
+	// 	logrus.Errorf("cannot unmarshal to json: %+v", err)
+	// 	return NmapStats{}
+	// }
+
 	ioutil.WriteFile("demo.json", bx, 0777)
 
 	return string(bx)
