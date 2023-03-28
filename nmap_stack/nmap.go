@@ -5,10 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 
 	"github.com/Ullaakut/nmap"
 	"github.com/sirupsen/logrus"
 )
+
+type PortDetails struct {
+	Nmap   NmapStats `json:"sys_ports"`
+	HostIP string    `json:"hostIP"`
+}
 
 type NmapStats []struct {
 	Distance struct {
@@ -133,13 +139,40 @@ func Stats(addr, portRange string) string {
 		logrus.Errorf("cannot marshal json: %+v", err)
 	}
 
-	// ns := &NmapStats{}
-	// if err = json.Unmarshal(bx, ns); err != nil {
-	// 	logrus.Errorf("cannot unmarshal to json: %+v", err)
-	// 	return NmapStats{}
-	// }
+	ns := &NmapStats{}
+	if err = json.Unmarshal(bx, ns); err != nil {
+		logrus.Errorf("cannot unmarshal to json: %+v", err)
+		return ""
+	}
 
-	ioutil.WriteFile("demo.json", bx, 0777)
+	addr1, err := getIPAddress()
+	if err != nil {
+		logrus.Errorf("cannot get ip address: %+v", err)
+		return ""
+	}
 
-	return string(bx)
+	pd := PortDetails{
+		Nmap:   *ns,
+		HostIP: addr1,
+	}
+
+	bxPd, err := json.MarshalIndent(pd, "", "\t")
+	if err != nil {
+		logrus.Errorf("cannot marshal json: %+v", err)
+	}
+
+	ioutil.WriteFile("demo.json", bxPd, 0777)
+
+	return string(bxPd)
+}
+
+func getIPAddress() (string, error) {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String(), nil
 }

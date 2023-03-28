@@ -121,12 +121,13 @@ func main() {
 		go sendStringToAPI("http://13.235.66.99/agent_ports_data", jsonVal)
 		go sendStringToAPI("http://13.235.66.99/add_agent_logs", string(bxStats))
 
-		time.Sleep(time.Minute * 10)
+		time.Sleep(time.Minute * 3)
 	}
 
 }
 
 func sendStringToAPI(url string, data string) error {
+	fmt.Printf("Sending data to API: ", url)
 	requestBody := bytes.NewBuffer([]byte(data))
 
 	req, err := http.NewRequest("POST", url, requestBody)
@@ -143,6 +144,6 @@ func sendStringToAPI(url string, data string) error {
 		return err
 	}
 	defer resp.Body.Close()
-
+	fmt.Printf("Ending execution for API: ", url)
 	return nil
 }
