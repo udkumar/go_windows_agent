@@ -7,3 +7,7 @@ Windows OS hardware information with Go
 1) Make each information with certain interval like 20 seconds
 2) Call all packages in single file under main function
 3) Want to send information to any API (kind of microservices or will build one app with multiple API for consume information.)
+
+# Steps to install
+
+## In Windows
