@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/drael/GOnetstat v0.0.0-20201004132414-bf4a88b0bdab // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
