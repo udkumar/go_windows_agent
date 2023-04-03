@@ -11,3 +11,8 @@ Windows OS hardware information with Go
 # Steps to install
 
 ## In Windows
+
+- Pull the Zip file from the repo
+- Unzip the file
+- Run the following command 
+`start /B path/to/the/agent`
