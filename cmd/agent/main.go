@@ -70,7 +70,7 @@ func main() {
 
 		go sendStringToAPI("http://13.235.66.99/agent_ports_data", jsonVal)
 		go sendStringToAPI("http://13.235.66.99/add_agent_logs", string(bxStats))
-		go sendStringToAPI("https://netstat_url", string(nsBytes))
+		go sendStringToAPI("http://13.235.66.99/agent_process_data", string(nsBytes))
 
 		time.Sleep(time.Minute * 3)
 	}

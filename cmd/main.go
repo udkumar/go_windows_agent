@@ -5,40 +5,57 @@ import (
 	"time"
 )
 
+func routineA(output chan<- string) {
+	for {
+		output <- "Routine A is running."
+		time.Sleep(10 * time.Second)
+	}
+}
+
+func routineB(output chan<- string) {
+	for {
+		output <- "Routine B is running."
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func routineC(output chan<- string) {
+	for {
+		output <- "Routine C is running."
+		time.Sleep(5 * time.Second)
+	}
+}
+
 func main() {
-	c := make(chan int)
-	Winticker := time.NewTicker(1 * time.Second)
-	Nmapticker := time.NewTicker(3 * time.Second)
+	fmt.Println("Starting Go routines...")
 
-	go Nmap(c, Nmapticker)
-	go Windows(c, Winticker)
+	// Create channels for communicating with the goroutines
+	output := make(chan string)
+	done := make(chan bool)
 
-	for {
-		select {
-		case val := <-c:
-			fmt.Printf("Received value from channel: %d\n", val)
+	// Start the goroutines
+	go routineA(output)
+	go routineB(output)
+	go routineC(output)
 
+	// Print the messages from the goroutines as they arrive
+	go func() {
+		for {
+			select {
+			case message := <-output:
+				fmt.Println(message)
+			case <-done:
+				return
+			}
 		}
-		fmt.Println()
-	}
-}
+	}()
 
-func Nmap(c chan<- int, ticker *time.Ticker) {
-	for {
-		select {
-		case <-ticker.C:
-			fmt.Println("Nmap sends value to channel")
-			c <- 1
-		}
-	}
-}
+	// Wait for user input to stop the routines
+	fmt.Println("Press ENTER to stop the routines.")
+	fmt.Scanln()
 
-func Windows(c chan<- int, ticker *time.Ticker) {
-	for {
-		select {
-		case <-ticker.C:
-			fmt.Println("Windows sends value to channel")
-			c <- 2
-		}
-	}
+	// Signal the goroutines to stop
+	done <- true
+
+	fmt.Println("Go routines stopped.")
 }
