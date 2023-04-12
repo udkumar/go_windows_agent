@@ -4,58 +4,134 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 
-	"github.com/drael/GOnetstat"
+	"github.com/Expand-My-Business/go_windows_agent/utils"
+	"github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/process"
 	"github.com/sirupsen/logrus"
 )
 
+type NetStatsDetails struct {
+	NetStats NetStats `json:"sys_ports"`
+	HostIP   string   `json:"hostIP"`
+}
+
 type NetStats struct {
-	UDPStats []GOnetstat.Process
-	TCPStats []GOnetstat.Process
-	HostIP   string `json:"hostIP"`
+	UDPStats []UDPStats
+	TCPStats []TCPStats
 }
 
-func Netstat() (NetStats, error) {
-	tcpData := GOnetstat.Tcp()
-	udpData := GOnetstat.Udp()
-
-	// tcp, err := json.MarshalIndent(tcpData, "", "\t")
-	// if err != nil {
-	// 	logrus.Errorf("cannot get tcp details")
-	// }
-
-	// udp, err := json.MarshalIndent(udpData, "", "\t")
-	// if err != nil {
-	// 	logrus.Errorf("cannot get tcp details")
-	// }
-	addr1, err := getIPAddress()
-	if err != nil {
-		logrus.Errorf("cannot get ip address: %+v", err)
-		return NetStats{}, err
-	}
-
-	netstat := NetStats{
-		UDPStats: udpData,
-		TCPStats: tcpData,
-		HostIP:   addr1,
-	}
-
-	bxStats, err := json.MarshalIndent(netstat, "", "    ")
-	if err != nil {
-		fmt.Errorf("cannot marshal to byteslice", err)
-	}
-	ioutil.WriteFile("netstat.json", bxStats, 0777)
-	return netstat, nil
+type TCPStats struct {
+	Name     string   `json:"processname"`
+	Family   uint32   `json:"family"`
+	Type     uint32   `json:"type"`
+	Laddr    net.Addr `json:"localaddr"`
+	Raddr    net.Addr `json:"remoteaddr"`
+	Status   string   `json:"status"`
+	Uids     []int32  `json:"uids"`
+	Pid      int32    `json:"pid"`
+	Protocol string   `json:"protocol"`
 }
 
-func getIPAddress() (string, error) {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		return "", err
-	}
-	defer conn.Close()
+type UDPStats struct {
+	Name     string   `json:"processname"`
+	Family   uint32   `json:"family"`
+	Type     uint32   `json:"type"`
+	Laddr    net.Addr `json:"localaddr"`
+	Raddr    net.Addr `json:"remoteaddr"`
+	Status   string   `json:"status"`
+	Uids     []int32  `json:"uids"`
+	Pid      int32    `json:"pid"`
+	Protocol string   `json:"protocol"`
+}
 
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	return localAddr.IP.String(), nil
+func GetNetStats() ([]byte, error) {
+	// Get TCP connections
+	tcpConns, err := net.Connections("tcp")
+	if err != nil {
+		panic(err)
+	}
+
+	allTCPStats := []TCPStats{}
+	// Print TCP connections with process names
+	fmt.Println("TCP Connections:")
+	for _, conn := range tcpConns {
+		proc, err := process.NewProcess(conn.Pid)
+		if err != nil {
+			panic(err)
+		}
+		name, err := proc.Name()
+		if err != nil {
+			panic(err)
+		}
+		tcpStats := TCPStats{}
+		tcpStats.Name = name
+		tcpStats.Family = conn.Family
+		tcpStats.Type = conn.Type
+		tcpStats.Laddr.IP = conn.Laddr.IP
+		tcpStats.Laddr.Port = conn.Laddr.Port
+		tcpStats.Raddr.IP = conn.Raddr.IP
+		tcpStats.Raddr.Port = conn.Raddr.Port
+		tcpStats.Pid = conn.Pid
+		tcpStats.Protocol = "TCP"
+		allTCPStats = append(allTCPStats, tcpStats)
+	}
+
+	// Get UDP connections
+	udpConns, err := net.Connections("udp")
+	if err != nil {
+		panic(err)
+	}
+
+	allUDPStats := []UDPStats{}
+
+	// Print UDP connections with process names
+	fmt.Println("UDP Connections:")
+	for _, conn := range udpConns {
+		proc, err := process.NewProcess(conn.Pid)
+		if err != nil {
+			panic(err)
+		}
+		name, err := proc.Name()
+		if err != nil {
+			panic(err)
+		}
+
+		udpStats := UDPStats{}
+		udpStats.Name = name
+		udpStats.Family = conn.Family
+		udpStats.Type = conn.Type
+		udpStats.Laddr.IP = conn.Laddr.IP
+		udpStats.Laddr.Port = conn.Laddr.Port
+		udpStats.Raddr.IP = conn.Raddr.IP
+		udpStats.Raddr.Port = conn.Raddr.Port
+		udpStats.Pid = conn.Pid
+		udpStats.Protocol = "UDP"
+		allUDPStats = append(allUDPStats, udpStats)
+	}
+
+	netStatDetails := NetStatsDetails{}
+	netStatDetails.NetStats = NetStats{
+		UDPStats: allUDPStats,
+		TCPStats: allTCPStats,
+	}
+
+	// Get private Ip
+	ip, err := utils.GetPrivateIPAddress()
+	if err != nil {
+		logrus.Errorf("cannot get private ip")
+	}
+
+	netStatDetails.HostIP = ip
+
+	byteSlice, err := json.MarshalIndent(netStatDetails, "", "\t")
+	if err != nil {
+		logrus.Errorf("cannot marshal net stat details: %+v", err)
+		return nil, err
+	}
+
+	ioutil.WriteFile("byteSlice.json", byteSlice, 777)
+
+	return byteSlice, err
+
 }
