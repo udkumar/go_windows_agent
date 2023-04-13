@@ -1,17 +1,14 @@
-package nmap_stack
+package nmap
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net"
 
+	"github.com/Expand-My-Business/go_windows_agent/utils"
 	"github.com/Ullaakut/nmap"
 	"github.com/sirupsen/logrus"
 )
 
-type PortDetails struct {
+type NmapDetails struct {
 	Nmap   NmapStats `json:"sys_ports"`
 	HostIP string    `json:"hostIP"`
 }
@@ -113,7 +110,7 @@ type NmapStats []struct {
 	Smurfs interface{} `json:"smurfs"`
 }
 
-func Stats(addr, portRange string) string {
+func GetNmapDetails(addr, portRange string) ([]byte, error) {
 	// Create a new Nmap scanner instance
 	scanner, err := nmap.NewScanner(
 		nmap.WithTargets(addr),
@@ -122,36 +119,39 @@ func Stats(addr, portRange string) string {
 		// nmap.WithOSDetection(),
 	)
 	if err != nil {
-		log.Fatalf("failed to create scanner: %v", err)
+		logrus.Fatalf("failed to create scanner: %v", err)
+		return nil, err
 	}
 
 	// Run the scan
 	result, warnings, err := scanner.Run()
 	if err != nil {
-		log.Fatalf("failed to run scan: %v", err)
+		logrus.Fatalf("failed to run scan: %v", err)
+		return nil, err
 	}
 
 	// Print any warnings from the scan
-	fmt.Printf("Warnings:\n%s\n", warnings)
+	logrus.Warnf("Warnings: %+v\n", warnings)
 
 	bx, err := json.MarshalIndent(result.Hosts, "", "\t")
 	if err != nil {
 		logrus.Errorf("cannot marshal json: %+v", err)
+		return nil, err
 	}
 
 	ns := &NmapStats{}
 	if err = json.Unmarshal(bx, ns); err != nil {
 		logrus.Errorf("cannot unmarshal to json: %+v", err)
-		return ""
+		return nil, err
 	}
 
-	addr1, err := getIPAddress()
+	addr1, err := utils.GetPrivateIPAddress()
 	if err != nil {
 		logrus.Errorf("cannot get ip address: %+v", err)
-		return ""
+		return nil, err
 	}
 
-	pd := PortDetails{
+	pd := NmapDetails{
 		Nmap:   *ns,
 		HostIP: addr1,
 	}
@@ -159,20 +159,8 @@ func Stats(addr, portRange string) string {
 	bxPd, err := json.MarshalIndent(pd, "", "\t")
 	if err != nil {
 		logrus.Errorf("cannot marshal json: %+v", err)
+		return nil, err
 	}
 
-	ioutil.WriteFile("demo.json", bxPd, 0777)
-
-	return string(bxPd)
-}
-
-func getIPAddress() (string, error) {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		return "", err
-	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	return localAddr.IP.String(), nil
+	return bxPd, nil
 }
