@@ -24,6 +24,7 @@ Windows OS hardware information with Go
 # Run agent in the background from source code
 
 ## Move to the directory where the `main.go` exists
+`cd cmd\main.go`
 
 ## Build the source file using the following command
 ```
@@ -33,6 +34,7 @@ go build
 ## To create the bin as a background service:
 ```
 sc create agent-world binPath= "C:\Users\davet\OneDrive\Desktop\go_windows_agent\cmd\agent\agent.exe" start= delayed-auto DisplayName= "Agent Background Service"
+sc create go-agent binPath= "C:\Users\davet\OneDrive\Desktop\go_windows_agent\go_windows_agent.exe" start= delayed-auto DisplayName= "Go Agent Background Service" 
 ```
 
 ## To start the service in the background
