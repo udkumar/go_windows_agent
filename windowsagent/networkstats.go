@@ -1,16 +1,14 @@
 package windowsagent
 
 import (
-    "fmt"
-
-    "github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/net"
+	"github.com/sirupsen/logrus"
 )
 
 func NetStats() ([]net.IOCountersStat, error) {
-    infoIOCounter, err := net.IOCounters(true)
-
-    //almost every return value is a struct
-    fmt.Printf("All net info: ", infoIOCounter)
-    return infoIOCounter, err
-    
+	infoIOCounter, err := net.IOCounters(true)
+	if err != nil {
+		logrus.Errorf("cannot get IOCounters, error: %+v", err)
+	}
+	return infoIOCounter, err
 }

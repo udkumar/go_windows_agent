@@ -1,17 +1,14 @@
 package windowsagent
 
 import (
-	"fmt"
-
 	"github.com/shirou/gopsutil/mem"
+	"github.com/sirupsen/logrus"
 )
 
 func MemoryStats() (*mem.VirtualMemoryStat, error) {
-	v, err := mem.VirtualMemory()
-
-	// almost every return value is a struct
-	fmt.Printf("Total: %v, Free:%v, UsedPercent:%f%%\n", v.Total, v.Free, v.UsedPercent)
-
-	fmt.Println(v.String())
-	return v, err
+	virtualMem, err := mem.VirtualMemory()
+	if err != nil {
+		logrus.Errorf("cannot dial to get outbound IP, error: %+v", err)
+	}
+	return virtualMem, err
 }

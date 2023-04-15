@@ -1,6 +1,9 @@
 package utils
 
-import "net"
+import (
+	"net"
+	"os"
+)
 
 func GetPrivateIPAddress() (string, error) {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
@@ -11,4 +14,9 @@ func GetPrivateIPAddress() (string, error) {
 
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP.String(), nil
+}
+
+// GetWorkingDir get the present working directory
+func GetWorkingDir() (string, error) {
+	return os.Getwd()
 }
