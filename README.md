@@ -30,21 +30,29 @@ Windows OS hardware information with Go
 ```
  go build -ldflags "-s -w" .\cmd\main.go
 ```
+OR
+```
+ go build -o main.exe .\cmd\main.go
+```
 
 ## To create the bin as a background service:
 ```
-sc create agent-world binPath= "C:\Users\davet\OneDrive\Desktop\go_windows_agent\cmd\agent\agent.exe" start= delayed-auto DisplayName= "Agent Background Service"
-sc create go-agent binPath= "C:\Users\davet\OneDrive\Desktop\go_windows_agent\go_windows_agent.exe" start= delayed-auto DisplayName= "Go Agent Background Service" 
+sc create Agent binPath= "C:\Users\Administrator\Desktop\go_windows_agent\main.exe" start= delayed-auto
 ```
 
 ## To start the service in the background
 ```
-sc start agent-world 
+sc start Agent
+```
+
+## To stop the service 
+```
+sc stop Agent
 ```
 
 ## To delete the service
 ```
-sc delete agent-world
+sc delete Agent
 ```
 
 
