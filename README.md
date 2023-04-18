@@ -23,14 +23,9 @@ Windows OS hardware information with Go
 
 # Run agent in the background from source code
 
-## Move to the directory where the `main.go` exists
-`cd cmd\main.go`
+## Move to the folder `go_windows_agent`
 
 ## Build the source file using the following command
-```
- go build -ldflags "-s -w" .\cmd\main.go
-```
-OR
 ```
  go build -o main.exe .\cmd\main.go
 ```
