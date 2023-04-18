@@ -28,7 +28,7 @@ Windows OS hardware information with Go
 
 ## Build the source file using the following command
 ```
-go build
+ go build -ldflags "-s -w" .\cmd\main.go
 ```
 
 ## To create the bin as a background service:

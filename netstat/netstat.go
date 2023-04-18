@@ -71,6 +71,7 @@ func GetNetStats() ([]byte, error) {
 		tcpStats.Laddr.Port = conn.Laddr.Port
 		tcpStats.Raddr.IP = conn.Raddr.IP
 		tcpStats.Raddr.Port = conn.Raddr.Port
+		tcpStats.Status = conn.Status
 		tcpStats.Pid = conn.Pid
 		tcpStats.Protocol = "TCP"
 		allTCPStats = append(allTCPStats, tcpStats)
@@ -104,6 +105,7 @@ func GetNetStats() ([]byte, error) {
 		udpStats.Laddr.Port = conn.Laddr.Port
 		udpStats.Raddr.IP = conn.Raddr.IP
 		udpStats.Raddr.Port = conn.Raddr.Port
+		udpStats.Status = conn.Status
 		udpStats.Pid = conn.Pid
 		udpStats.Protocol = "UDP"
 		allUDPStats = append(allUDPStats, udpStats)
@@ -130,5 +132,4 @@ func GetNetStats() ([]byte, error) {
 	}
 
 	return byteSlice, err
-
 }

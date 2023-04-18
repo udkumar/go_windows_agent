@@ -65,7 +65,7 @@ func routineCNetStat(url string, output chan<- Message) {
 	}
 }
 
-func main() {
+func Run() {
 	currentWD, err := utils.GetWorkingDir()
 	if err != nil {
 		logrus.Errorf("cannot get the current working dir, error: %+v", err)
@@ -114,6 +114,9 @@ func main() {
 	done <- true
 
 	fmt.Println("Go routines stopped.")
+}
+func main() {
+	Run()
 }
 
 func sendStringToAPI(url string, data string) error {
