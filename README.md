@@ -16,3 +16,40 @@ Windows OS hardware information with Go
 - Unzip the file
 - Run the following command 
 `start /B path/to/the/agent`
+
+<br>
+<br>
+<br>
+
+# Run agent in the background from source code
+
+## Move to the folder `go_windows_agent`
+
+## Build the source file using the following command
+```
+ go build -o main.exe .\cmd\main.go
+```
+
+## To create the bin as a background service:
+```
+sc create Agent binPath= "C:\Users\Administrator\Desktop\go_windows_agent\main.exe" start= delayed-auto
+```
+
+## To start the service in the background
+```
+sc start Agent
+```
+
+## To stop the service 
+```
+sc stop Agent
+```
+
+## To delete the service
+```
+sc delete Agent
+```
+
+
+NOTE: In case of any error please follow to the blog/article:
+https://www.partitionwizard.com/clone-disk/windows-could-not-start-the-service-on-local-computer-error-1053.html

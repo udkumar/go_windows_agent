@@ -2,15 +2,15 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/Expand-My-Business/go_windows_agent/netstat"
 	"github.com/Expand-My-Business/go_windows_agent/nmap"
+	"github.com/Expand-My-Business/go_windows_agent/utils"
 	"github.com/Expand-My-Business/go_windows_agent/windowsagent"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -35,8 +35,14 @@ type Stats struct {
 }
 
 func main() {
-	// Open a file for writing
-	file, err := os.OpenFile("agent.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	currentWD, err := utils.GetWorkingDir()
+	if err != nil {
+		logrus.Errorf("cannot get the current working dir, error: %+v", err)
+	}
+
+	logfilePath := filepath.Join(currentWD, "agent.log")
+	// Open a file for writing store the log file in current working directory
+	file, err := os.OpenFile(logfilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		logrus.Errorf("cannot open the logfile, error: %+v", err)
 	}
@@ -58,40 +64,11 @@ func main() {
 	if err != nil {
 		logrus.Errorf("cannot get netstat details, error: %+v", nil)
 	}
-	// windowsStats := &Stats{}
-	// cpu, _ := windowsagent.CpuStats()
-	// disk, _ := windowsagent.DiskStats()
-	// host, _ := windowsagent.HostStats()
-	// memory, _ := windowsagent.MemoryStats()
-	// network, _ := windowsagent.NetStats()
-	// out := windowsagent.GetOutboundIP()
 
-	// windowsStats.CpuInfo = cpu
-	// windowsStats.DiskInfo = disk
-	// windowsStats.HostInfo = host
-	// windowsStats.MemoryInfo = memory
-	// windowsStats.NetworkInfo = network
-	// windowsStats.HostIP = out
+	// ioutil.WriteFile("nmapXbyte.json", nmapXbyte, 0777)
+	// ioutil.WriteFile("winXbytes.json", winXbytes, 0777)
+	// ioutil.WriteFile("netXbyte.json", netXbyte, 0777)
 
-	// bxStats, err := json.MarshalIndent(windowsStats, "", "    ")
-	// if err != nil {
-	// 	logrus.Errorf("cannot marshal to byteslice", err)
-	// }
-
-	// netStats, err := netstat.Netstat()
-	// if err != nil {
-	// 	logrus.Errorf("cannot marshal to byteslice", err)
-	// }
-
-	// nsBytes, err := json.MarshalIndent(netStats, "", "    ")
-	// if err != nil {
-	// 	logrus.Errorf("cannot marshal to byteslice", err)
-	// }
-
-	ioutil.WriteFile("nmapXbyte.json", nmapXbyte, 0777)
-	ioutil.WriteFile("winXbytes.json", winXbytes, 0777)
-	ioutil.WriteFile("netXbyte.json", netXbyte, 0777)
-	// ioutil.WriteFile("netStats.json", nsBytes, 0777)
 	// Send json value to certain API and certain interval
 	for {
 
@@ -105,11 +82,12 @@ func main() {
 }
 
 func sendStringToAPI(url string, data string) error {
-	logrus.Infof("Sending data to API: ", url)
+	logrus.Infof("Sending data to API: %s", url)
 	requestBody := bytes.NewBuffer([]byte(data))
 
 	req, err := http.NewRequest("POST", url, requestBody)
 	if err != nil {
+		logrus.Errorf("cannot make a request wrapper, error: %+v", err)
 		return err
 	}
 
@@ -119,9 +97,10 @@ func sendStringToAPI(url string, data string) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
+		logrus.Errorf("cannot send a request, error: %+v", err)
 		return err
 	}
 	defer resp.Body.Close()
-	fmt.Printf("Ending execution for API: ", url)
+	logrus.Infof("Ending execution for API: %s", url)
 	return nil
 }

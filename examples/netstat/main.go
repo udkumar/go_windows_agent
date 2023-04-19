@@ -1,14 +1,19 @@
-package netstat
+package main
 
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/Expand-My-Business/go_windows_agent/utils"
 	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/process"
 	"github.com/sirupsen/logrus"
 )
+
+func main() {
+	GetNetStats()
+}
 
 type NetStatsDetails struct {
 	NetStats NetStats `json:"sys_ports"`
@@ -53,7 +58,7 @@ func GetNetStats() ([]byte, error) {
 
 	allTCPStats := []TCPStats{}
 	// Print TCP connections with process names
-	fmt.Println("Getting stats for TCP connections")
+	fmt.Println("TCP Connections:")
 	for _, conn := range tcpConns {
 		proc, err := process.NewProcess(conn.Pid)
 		if err != nil {
@@ -71,7 +76,6 @@ func GetNetStats() ([]byte, error) {
 		tcpStats.Laddr.Port = conn.Laddr.Port
 		tcpStats.Raddr.IP = conn.Raddr.IP
 		tcpStats.Raddr.Port = conn.Raddr.Port
-		tcpStats.Status = conn.Status
 		tcpStats.Pid = conn.Pid
 		tcpStats.Protocol = "TCP"
 		allTCPStats = append(allTCPStats, tcpStats)
@@ -86,7 +90,7 @@ func GetNetStats() ([]byte, error) {
 	allUDPStats := []UDPStats{}
 
 	// Print UDP connections with process names
-	fmt.Println("Getting stats for UDP connections")
+	fmt.Println("UDP Connections:")
 	for _, conn := range udpConns {
 		proc, err := process.NewProcess(conn.Pid)
 		if err != nil {
@@ -105,7 +109,6 @@ func GetNetStats() ([]byte, error) {
 		udpStats.Laddr.Port = conn.Laddr.Port
 		udpStats.Raddr.IP = conn.Raddr.IP
 		udpStats.Raddr.Port = conn.Raddr.Port
-		udpStats.Status = conn.Status
 		udpStats.Pid = conn.Pid
 		udpStats.Protocol = "UDP"
 		allUDPStats = append(allUDPStats, udpStats)
@@ -131,5 +134,8 @@ func GetNetStats() ([]byte, error) {
 		return nil, err
 	}
 
+	ioutil.WriteFile("byteSlice.json", byteSlice, 777)
+
 	return byteSlice, err
+
 }
