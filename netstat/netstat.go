@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Expand-My-Business/go_windows_agent/netstat/commands"
 	"github.com/Expand-My-Business/go_windows_agent/utils"
 	"github.com/shirou/gopsutil/net"
 	"github.com/shirou/gopsutil/process"
@@ -16,8 +17,9 @@ type NetStatsDetails struct {
 }
 
 type NetStats struct {
-	UDPStats []UDPStats
-	TCPStats []TCPStats
+	UDPStats  []UDPStats
+	TCPStats  []TCPStats
+	BGProcess []commands.Process
 }
 
 type TCPStats struct {
@@ -111,10 +113,16 @@ func GetNetStats() ([]byte, error) {
 		allUDPStats = append(allUDPStats, udpStats)
 	}
 
+	processes, err := commands.GetAllInternalProcess()
+	if err != nil {
+		logrus.Errorf("cannot get background process, error: %s", err)
+	}
+
 	netStatDetails := NetStatsDetails{}
 	netStatDetails.NetStats = NetStats{
-		UDPStats: allUDPStats,
-		TCPStats: allTCPStats,
+		UDPStats:  allUDPStats,
+		TCPStats:  allTCPStats,
+		BGProcess: processes,
 	}
 
 	// Get private Ip

@@ -1,9 +1,11 @@
 package commands
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"io/ioutil"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -26,6 +28,17 @@ type NetstatB struct {
 	ForeignAddress string `json:"foreign_address"`
 	State          string `json:"state"`
 	ProcessName    string `json:"process_name"`
+}
+type Process struct {
+	ImageName   string
+	PID         int
+	SessionName string
+	SessionNum  int
+	MemUsage    string
+	Status      string
+	UserName    string
+	CPUTime     string
+	WindowTitle string
 }
 
 func GetNetstatA() ([]NetstatA, error) {
@@ -121,4 +134,44 @@ func GetNetStats() {
 		logrus.Errorf("cannot unmarshal netstat -b values, error: %v", err)
 	}
 	ioutil.WriteFile("netstatcmd.json", nsCmdByte, 777)
+}
+
+func GetAllInternalProcess() ([]Process, error) {
+	cmd := exec.Command("tasklist", "/v", "/fo", "csv")
+	output, err := cmd.Output()
+	if err != nil {
+		logrus.Errorf("cannot run task command, error: %v", err)
+		return nil, err
+	}
+	reader := csv.NewReader(strings.NewReader(string(output)))
+	records, err := reader.ReadAll()
+	if err != nil {
+		logrus.Errorf("cannot read tasklist output, error: %v", err)
+		return nil, err
+	}
+	processes := make([]Process, len(records)-1)
+	for i, record := range records[1:] {
+		pid, _ := strconv.Atoi(record[1])
+		sessionNum, _ := strconv.Atoi(record[3])
+		processes[i] = Process{
+			ImageName:   record[0],
+			PID:         pid,
+			SessionName: record[2],
+			SessionNum:  sessionNum,
+			MemUsage:    record[4],
+			Status:      record[5],
+			UserName:    record[6],
+			CPUTime:     record[7],
+			WindowTitle: record[8],
+		}
+	}
+
+	// processesByte, err := json.MarshalIndent(processes, "", "\t")
+	// if err != nil {
+	// 	logrus.Errorf("cannot unmarshal unmarshal processes, error: %v", err)
+	// 	return nil, err
+	// }
+	// ioutil.WriteFile("allinternalprocess.json", processesByte, 0777)
+
+	return processes, nil
 }
