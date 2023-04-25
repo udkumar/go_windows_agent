@@ -9,7 +9,6 @@ import (
 
 	"github.com/Expand-My-Business/go_windows_agent/netstat"
 	"github.com/Expand-My-Business/go_windows_agent/nmap"
-	"github.com/Expand-My-Business/go_windows_agent/utils"
 	"github.com/Expand-My-Business/go_windows_agent/windowsagent"
 	"github.com/kardianos/service"
 	"github.com/sirupsen/logrus"
@@ -138,7 +137,7 @@ func (m *myService) run() {
 		for {
 			select {
 			case message := <-output:
-				fmt.Println("Sending json to the adress :", message.url)
+				fmt.Println("Sending json to the adress: ", message.url)
 				go sendStringToAPI(message.url, string(message.data))
 			case <-m.done:
 				// Stop the goroutines by closing the output channel and waiting for them to finish
@@ -160,15 +159,17 @@ func (m *myService) run() {
 }
 
 func main() {
-	// Call your existing service function here.
-	_, err := utils.GetWorkingDir()
-	if err != nil {
-		logrus.Errorf("cannot get the current working dir, error: %+v", err)
+	// Check if directory exists, if not create it
+	folderPath := `C:\Program Files\GoAgent`
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		err := os.MkdirAll(folderPath, 0755)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
-	// logfilePath := filepath.Join(currentWD, "agent.log")
-	// Open a file for writing store the log file in current working directory
-	file, err := os.OpenFile(`C:\Users\Administrator\Desktop\go_windows_agent\agent.log`, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	// Call your existing service function here.
+	file, err := os.OpenFile(folderPath+"\\go_agent.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		logrus.Errorf("cannot open the logfile, error: %+v", err)
 	}
