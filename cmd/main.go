@@ -17,6 +17,7 @@ import (
 type Message struct {
 	data []byte
 	url  string
+	err  error
 }
 
 func routineANmap(url string, output chan<- Message, done <-chan struct{}) {
@@ -25,9 +26,13 @@ func routineANmap(url string, output chan<- Message, done <-chan struct{}) {
 		case <-done:
 			return
 		default:
-			nmapXbyte, err := nmap.GetNmapDetails("127.0.0.1", "1-1000")
+			nmapXbyte, err := nmap.GetNmapDetails("127.0.0.1", "1-65000")
 			if err != nil {
 				logrus.Errorf("cannot get nmap details, error: %+v", err)
+				output <- Message{
+					err: err,
+					url: url,
+				}
 			} else {
 				output <- Message{
 					data: nmapXbyte,
@@ -47,7 +52,11 @@ func routineBWindows(url string, output chan<- Message, done <-chan struct{}) {
 		default:
 			winXbytes, err := windowsagent.GetWindowsStats()
 			if err != nil {
-				logrus.Errorf("cannot get windows stats, error: %+v", nil)
+				logrus.Errorf("cannot get windows stats, error: %+v", err)
+				output <- Message{
+					err: err,
+					url: url,
+				}
 			} else {
 				output <- Message{
 					data: winXbytes,
@@ -67,7 +76,11 @@ func routineCNetStat(url string, output chan<- Message, done <-chan struct{}) {
 		default:
 			netXbyte, err := netstat.GetNetStats()
 			if err != nil {
-				logrus.Errorf("cannot get netstat details, error: %+v", nil)
+				logrus.Errorf("cannot get netstat details, error: %+v", err)
+				output <- Message{
+					err: err,
+					url: url,
+				}
 			} else {
 				output <- Message{
 					data: netXbyte,

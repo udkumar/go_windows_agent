@@ -116,7 +116,8 @@ func GetNmapDetails(addr, portRange string) ([]byte, error) {
 		nmap.WithTargets(addr),
 		nmap.WithPorts(portRange),
 		nmap.WithServiceInfo(),
-		// nmap.WithOSDetection(),
+		nmap.WithVersionAll(),
+		nmap.WithVersionTrace(),
 	)
 	if err != nil {
 		logrus.Fatalf("failed to create scanner: %v", err)
@@ -124,14 +125,14 @@ func GetNmapDetails(addr, portRange string) ([]byte, error) {
 	}
 
 	// Run the scan
-	result, warnings, err := scanner.Run()
+	result, _, err := scanner.Run()
 	if err != nil {
 		logrus.Fatalf("failed to run scan: %v", err)
 		return nil, err
 	}
 
 	// Print any warnings from the scan
-	logrus.Warnf("Warnings: %+v\n", warnings)
+	// logrus.Warnf("Warnings: %+v\n", warnings)
 
 	bx, err := json.MarshalIndent(result.Hosts, "", "\t")
 	if err != nil {
@@ -162,5 +163,8 @@ func GetNmapDetails(addr, portRange string) ([]byte, error) {
 		return nil, err
 	}
 
+	// if err := ioutil.WriteFile("old_nmap.json", bxPd, 0644); err != nil {
+	// 	panic(err)
+	// }
 	return bxPd, nil
 }
