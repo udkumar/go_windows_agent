@@ -24,8 +24,21 @@ nmap -V
 # Set the current working directory to the location of the script
 Set-Location $PSScriptRoot
 
-# Build the binary from the Go source code
-go build -o .\main.exe .\cmd\main.go
+# Check if main.exe exists in the current directory
+if (Test-Path -Path ".\main.exe") {
+    # If it does, ask the user if they want to rebuild
+    $buildResponse = Read-Host "main.exe already exists. Do you want to rebuild? (y/n)"
+    if ($buildResponse -eq "y" -or $buildResponse -eq "Y") {
+        # If the user wants to rebuild, run the go build command
+        go build -o .\main.exe .\cmd\main.go
+    } else {
+        # If the user doesn't want to rebuild, skip the go build command
+        Write-Host "Skipping build."
+    }
+} else {
+    # If main.exe doesn't exist, run the go build command
+    go build -o .\main.exe .\cmd\main.go
+}
 
 # Define variables
 $serviceName = "GoAgent"
