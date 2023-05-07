@@ -10,6 +10,7 @@ import (
 	"github.com/Expand-My-Business/go_windows_agent/netstat"
 	"github.com/Expand-My-Business/go_windows_agent/nmap"
 	"github.com/Expand-My-Business/go_windows_agent/windowsagent"
+	"github.com/Expand-My-Business/go_windows_agent/windowseventlogs"
 	"github.com/kardianos/service"
 	"github.com/sirupsen/logrus"
 )
@@ -92,6 +93,30 @@ func routineCNetStat(url string, output chan<- Message, done <-chan struct{}) {
 	}
 }
 
+func routineWinLogs(url string, output chan<- Message, done <-chan struct{}) {
+	for {
+		select {
+		case <-done:
+			return
+		default:
+			netXbyte, err := windowseventlogs.GetLogData()
+			if err != nil {
+				logrus.Errorf("cannot get windoes logs, error: %+v", err)
+				output <- Message{
+					err: err,
+					url: url,
+				}
+			} else {
+				output <- Message{
+					data: netXbyte,
+					url:  url,
+				}
+			}
+			time.Sleep(5 * time.Minute)
+		}
+	}
+}
+
 func sendStringToAPI(url string, data string) error {
 	logrus.Infof("Sending data to API: %s", url)
 	requestBody := bytes.NewBuffer([]byte(data))
@@ -144,6 +169,7 @@ func (m *myService) run() {
 	go routineANmap("http://13.235.66.99/agent_ports_data", output, nil)
 	go routineBWindows("http://13.235.66.99/add_agent_logs", output, nil)
 	go routineCNetStat("http://13.235.66.99/agent_process_data", output, nil)
+	go routineWinLogs("http://13.235.66.99/agent_system_logs_data", output, nil)
 
 	// Print the messages from the goroutines as they arrive
 	go func() {
