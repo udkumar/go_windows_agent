@@ -15,7 +15,7 @@ type Win32_NTEventLogFile struct {
 
 type LogData struct {
 	Data   []Win32_NTLogEvent `json:"logs"`
-	HostIP string             `json:"host_ip"`
+	HostIP string             `json:"hostIP"`
 }
 
 type Win32_NTLogEvent struct {
