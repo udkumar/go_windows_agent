@@ -21,3 +21,9 @@
 *.rar
 *.tar
 *.zip
+demo.json
+Local
+netstat.json
+
+*.json
+agent.log
