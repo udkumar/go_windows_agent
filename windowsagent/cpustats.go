@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net"
 
+	"github.com/Expand-My-Business/go_windows_agent/utils"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -12,12 +13,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type Addr struct {
+	MacAddr   string `json:"mac_address"`
+	PublicIp  string `json:"public_ip"`
+	PrivateIp string `json:"private_ip"`
+}
+
 type Stats struct {
 	CpuInfo     []cpu.InfoStat         `json:"cpuInfo,omitempty"`
 	DiskInfo    *disk.UsageStat        `json:"diskInfo,omitempty"`
 	HostInfo    *host.InfoStat         `json:"hostInfo,omitempty"`
 	MemoryInfo  *mem.VirtualMemoryStat `json:"memoryInfo,omitempty"`
 	NetworkInfo []next.IOCountersStat  `json:"networkInfo,omitempty"`
+	Addr        Addr                   `json:"address"`
 	HostIP      net.IP                 `json:"hostIP,omitempty"`
 }
 
@@ -48,13 +56,32 @@ func GetWindowsStats() ([]byte, error) {
 	}
 
 	out := GetOutboundIP()
+	macAddr, err := utils.GetMacAddresses()
+	if err != nil {
+		logrus.Errorf("cannot get the mac address")
+	}
 
+	pubAddr, err := utils.GetPublicIP()
+	if err != nil {
+		logrus.Errorf("cannot get the mac address")
+	}
+
+	privAddr, err := utils.GetPrivateIPAddress()
+	if err != nil {
+		logrus.Errorf("cannot get the mac address")
+	}
+	addr := Addr{
+		MacAddr:   macAddr,
+		PublicIp:  pubAddr,
+		PrivateIp: privAddr,
+	}
 	windowsStats.CpuInfo = cpu
 	windowsStats.DiskInfo = disk
 	windowsStats.HostInfo = host
 	windowsStats.MemoryInfo = memory
 	windowsStats.NetworkInfo = network
 	windowsStats.HostIP = out
+	windowsStats.Addr = addr
 
 	windowsByteSlice, err := json.MarshalIndent(windowsStats, "", "\t")
 	if err != nil {

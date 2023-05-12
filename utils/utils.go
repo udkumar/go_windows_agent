@@ -66,7 +66,7 @@ func GetMacAddresses() (string, error) {
 		for _, addr := range addrs {
 			if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 				hwAddr := iface.HardwareAddr
-				fmt.Printf("MAC address: %s\n", hwAddr.String())
+				logrus.Infof("MAC address: %s\n", hwAddr.String())
 				return hwAddr.String(), nil
 			}
 		}
