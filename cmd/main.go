@@ -115,7 +115,7 @@ func routineWinLogs(url string, output chan<- Message, done <-chan struct{}) {
 					url:  url,
 				}
 			}
-			time.Sleep(5 * time.Minute)
+			time.Sleep(10 * time.Second)
 		}
 	}
 }

@@ -15,7 +15,7 @@ type Win32_NTEventLogFile struct {
 
 type LogData struct {
 	Data   []Win32_NTLogEvent `json:"logs"`
-	HostIP string             `json:"host_ip"`
+	HostIP string             `json:"hostIP"`
 }
 
 type Win32_NTLogEvent struct {
@@ -123,6 +123,6 @@ func GetLogData() ([]byte, error) {
 		logrus.Error("cannot marshal to even log, error: %+v", err)
 		return nil, err
 	}
-
+	// ioutil.WriteFile("sys_logs.json", jsonString, 0777)
 	return jsonString, nil
 }

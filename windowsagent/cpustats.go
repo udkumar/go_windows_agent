@@ -89,6 +89,9 @@ func GetWindowsStats() ([]byte, error) {
 		return nil, err
 	}
 
+	// if err := ioutil.WriteFile("address.json", windowsByteSlice, 0777); err != nil {
+	// 	logrus.Errorf("cannot write address.json, error: %+v", err)
+	// }
 	return windowsByteSlice, nil
 
 }
