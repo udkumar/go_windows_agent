@@ -11,7 +11,7 @@ import (
 	"github.com/Expand-My-Business/go_windows_agent/netstat"
 	"github.com/Expand-My-Business/go_windows_agent/nmap"
 	"github.com/Expand-My-Business/go_windows_agent/windowsagent"
-	"github.com/Expand-My-Business/go_windows_agent/windowseventlogs"
+	"github.com/Expand-My-Business/go_windows_agent/windowslogs"
 	"github.com/kardianos/service"
 	"github.com/sirupsen/logrus"
 )
@@ -102,7 +102,7 @@ func routineWinLogs(url string, output chan<- Message, done <-chan struct{}) {
 		case <-done:
 			return
 		default:
-			netXbyte, err := windowseventlogs.GetLogData()
+			netXbyte, err := windowslogs.GetLogData()
 			if err != nil {
 				logrus.Errorf("cannot get windoes logs, error: %+v", err)
 				output <- Message{

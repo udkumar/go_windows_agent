@@ -28,16 +28,14 @@ func GetWorkingDir() (string, error) {
 }
 
 func GetPublicIP() (string, error) {
-	resp, err := http.Get("https://ifconfig.co/ip")
+	resp, err := http.Get("https://api.ipify.org?format=text")
 	if err != nil {
-		logrus.Errorf("cannot execute API, error: %+v", err)
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	ip, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logrus.Errorf("cannot read the IP, error: %+v", err)
 		return "", err
 	}
 

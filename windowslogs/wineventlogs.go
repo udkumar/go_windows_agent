@@ -1,4 +1,4 @@
-package windowseventlogs
+package windowslogs
 
 import (
 	"encoding/json"
