@@ -36,6 +36,9 @@ $displayName = "GoAgent"
 $description = "My custom service"
 $binaryPath = Join-Path $PSScriptRoot "main.exe"
 
+# Prompt for the company code
+$companyCode = Read-Host "Enter the company code"
+
 # Check if the service exists
 if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
     # Stop the service if it's running
@@ -46,22 +49,14 @@ if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
     # Delete the service
     & sc.exe delete $serviceName
     Write-Host "The '$serviceName' service has been deleted."
-
-      # The service does not exist, so create it
-      Write-Host "Creating the '$displayName' service, pointing to executable '$binaryPath'"
-      New-Service -Name $serviceName -BinaryPathName $binaryPath -DisplayName $displayName -Description $description -StartupType Automatic
-  
-      # Start the service
-      Write-Host "Starting the '$displayName' service..."
-      # Start-Service -Name $serviceName
-
-}else {
-        # The service does not exist, so create it
-        Write-Host "Creating the '$displayName' service, pointing to executable '$binaryPath'"
-        New-Service -Name $serviceName -BinaryPathName $binaryPath -DisplayName $displayName -Description $description -StartupType Automatic
-    
-        # Start the service
-        Write-Host "Starting the '$displayName' service..."
-        # Start-Service -Name $serviceName
 }
+
+# The service does not exist, so create it
+Write-Host "Creating the '$displayName' service, pointing to executable '$binaryPath' with company code '$companyCode'"
+New-Service -Name $serviceName -BinaryPathName "$binaryPath -companycode $companyCode" -DisplayName $displayName -Description $description -StartupType Automatic
+
+# Start the service
+Write-Host "Starting the '$displayName' service..."
+Start-Service -Name $serviceName
+
 

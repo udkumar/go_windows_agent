@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -14,6 +15,8 @@ import (
 	"github.com/kardianos/service"
 	"github.com/sirupsen/logrus"
 )
+
+var companyCode string
 
 type Message struct {
 	data []byte
@@ -112,7 +115,7 @@ func routineWinLogs(url string, output chan<- Message, done <-chan struct{}) {
 					url:  url,
 				}
 			}
-			time.Sleep(5 * time.Minute)
+			time.Sleep(10 * time.Second)
 		}
 	}
 }
@@ -126,8 +129,9 @@ func sendStringToAPI(url string, data string) error {
 		logrus.Errorf("cannot make a request wrapper, error: %+v", err)
 		return err
 	}
-
+	logrus.Info("companycode: ", companyCode) // TODO: Remove this line
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("company-code", companyCode)
 
 	client := http.Client{}
 
@@ -186,18 +190,18 @@ func (m *myService) run() {
 		}
 	}()
 
-	// // Wait for user input to stop the service
-	// fmt.Println("Press ENTER to stop the service.")
-	// fmt.Scanln()
+}
 
-	// // Stop the service by calling service.Stop
-	// err := service.Control(m, service)
-	// if err != nil {
-	// 	logrus.Errorf("Error stopping the service: %s\n", err)
-	// }
+func init() {
+	flag.StringVar(&companyCode, "companycode", "", "Company code")
+	flag.Parse()
 }
 
 func main() {
+	if companyCode != "" {
+		logrus.Info("Company code isn't available:", companyCode)
+	}
+
 	// Check if directory exists, if not create it
 	folderPath := `C:\Program Files\GoAgent`
 	if _, err := os.Stat(folderPath); os.IsNotExist(err) {

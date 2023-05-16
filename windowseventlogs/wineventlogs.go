@@ -123,6 +123,6 @@ func GetLogData() ([]byte, error) {
 		logrus.Error("cannot marshal to even log, error: %+v", err)
 		return nil, err
 	}
-
+	// ioutil.WriteFile("sys_logs.json", jsonString, 0777)
 	return jsonString, nil
 }
