@@ -1,7 +1,8 @@
 package windowslogs
 
 type Logs struct {
-	SecurityLogs []Log
+	SecurityLogs    []Log
+	ApplicationLogs []Log
 }
 
 type Log struct {

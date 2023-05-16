@@ -102,7 +102,7 @@ func routineWinLogs(url string, output chan<- Message, done <-chan struct{}) {
 		case <-done:
 			return
 		default:
-			netXbyte, err := windowslogs.GetLogData()
+			netXbyte, err := windowslogs.GetSystemLogs()
 			if err != nil {
 				logrus.Errorf("cannot get windoes logs, error: %+v", err)
 				output <- Message{
